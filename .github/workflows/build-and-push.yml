@@ -36,8 +36,12 @@ jobs:
 
     # 标记 Docker 镜像
     - name: 标记 Docker 镜像
-      run: docker tag loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} loveu5522/local-media-scraper:latest
+      run: |
+        docker tag loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }}
+        docker tag loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} loveu5522/local-media-scraper:latest
 
     # 推送 Docker 镜像
     - name: 推送 Docker 镜像
-      run: docker push loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} && docker push loveu5522/local-media-scraper:latest
+      run: |
+        docker push loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }}
+        docker push loveu5522/local-media-scraper:latest
