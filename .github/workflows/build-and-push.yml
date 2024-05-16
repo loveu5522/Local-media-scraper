@@ -1,23 +1,46 @@
-name: Build and Push Docker Image
+name: 构建并推送 Docker 镜像
 
+# 当推送到 main 分支时触发构建
 on:
   push:
     branches:
-      - main  # 根据你的主分支名设置触发条件....
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    # 检出代码
+    - name: 检出代码
       uses: actions/checkout@v2
 
-    - name: Login to Docker Hub
+    # 设置 Docker Buildx
+    - name: 设置 Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    # 登录到 Docker Hub
+    - name: 登录到 Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Build Docker image
-      run: docker build -t loveu5522/local-media-scraper:latest .
+    # 获取最新的标签
+    - name: 获取最新的标签
+      id: get_tag
+      run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
 
-    - name: Push Docker image
-      run: docker push loveu5522/local-media-scraper:latest
+    # 确定新版本号
+    - name: 确定新版本号
+      id: determine_version
+      run: echo ::set-output name=NEW_VERSION::$(echo "${{ steps.get_tag.outputs.TAG }}" | awk -F. '{$NF+=0.1; OFS="."; print}')
+
+    # 构建 Docker 镜像
+    - name: 构建 Docker 镜像
+      run: docker build -t loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} .
+
+    # 标记 Docker 镜像
+    - name: 标记 Docker 镜像
+      run: docker tag loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} loveu5522/local-media-scraper:latest
+
+    # 推送 Docker 镜像
+    - name: 推送 Docker 镜像
+      run: docker push loveu5522/local-media-scraper:${{ steps.determine_version.outputs.NEW_VERSION }} && docker push loveu5522/local-media-scraper:latest
