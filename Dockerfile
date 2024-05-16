@@ -10,7 +10,7 @@ RUN apt-get update && \
     pip install --no-cache-dir xmltodict
 
 # 复制脚本文件到工作目录
-COPY /config/script.py /app/script.py
+COPY config/script.py /app/script.py
 
 # 运行脚本
 CMD ["python", "script.py"]
