@@ -25,8 +25,9 @@ jobs:
 
     # 获取最新的标签
     - name: 获取最新的标签
-      id: get_tag
-      run: git fetch --tags && echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+      run: |
+        git fetch --tags
+        echo ::set-output name=TAG::$(git describe --tags $(git rev-list --tags --max-count=1))
 
     # 确定新版本号
     - name: 确定新版本号
