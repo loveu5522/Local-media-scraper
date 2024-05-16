@@ -31,7 +31,7 @@ jobs:
     # 确定新版本号
     - name: 确定新版本号
       id: determine_version
-      run: echo ::set-output name=NEW_VERSION::$(echo "${{ steps.get_tag.outputs.TAG }}" | awk -F. '{$NF+=0.1; OFS="."; print}')
+      run: echo ::set-output name=NEW_VERSION::$(awk -F. '{printf "%d.%d", $1, ($2 + 1)}' <<< "${{ steps.get_tag.outputs.TAG }}")
 
     # 构建 Docker 镜像
     - name: 构建 Docker 镜像
