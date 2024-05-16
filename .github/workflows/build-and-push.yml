@@ -26,12 +26,15 @@ jobs:
     # 获取最新的标签
     - name: 获取最新的标签
       id: get_tag
-      run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+      run: git fetch --tags && echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
 
     # 确定新版本号
     - name: 确定新版本号
       id: determine_version
-      run: echo ::set-output name=NEW_VERSION::$(awk -F. '{printf "%d.%d", $1, ($2 + 1)}' <<< "${{ steps.get_tag.outputs.TAG }}")
+      run: |
+        current_tag=$(echo "${{ steps.get_tag.outputs.TAG }}")
+        version=$(echo $current_tag | awk -F. '{printf "%d.%d", $1, ($2 + 1)}')
+        echo "::set-output name=NEW_VERSION::$version"
 
     # 构建 Docker 镜像
     - name: 构建 Docker 镜像
