@@ -23,18 +23,11 @@ jobs:
     - name: 登录到 Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # 获取最新的标签
-    - name: 获取最新的标签
-      run: |
-        git fetch --tags
-        echo ::set-output name=TAG::$(git describe --tags $(git rev-list --tags --max-count=1))
-
     # 确定新版本号
     - name: 确定新版本号
       id: determine_version
       run: |
-        current_tag=$(echo "${{ steps.get_tag.outputs.TAG }}")
-        version=$(echo $current_tag | awk -F. '{printf "%d.%d", $1, ($2 + 1)}')
+        version=$(date +"%Y-%m-%d-%H%M%S")
         echo "::set-output name=NEW_VERSION::$version"
 
     # 构建 Docker 镜像
